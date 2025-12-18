@@ -1,0 +1,1 @@
+A simple HTML CSS and Javascript calculator. Currently it uses eval() to run the calculation which is insecure so I'll be working on a custom parser user a Shunting Yard algorithm to calculate it instead.
