@@ -41,27 +41,68 @@ function handleClear() {
     screen.value = "";
 }
 
+// Define operator precedence for converting to post-fix.
+    const operatorPrecedence = {
+        '+': 1,
+        '-': 1,
+        '*': 2,
+        '/': 2
+    };
+
+// Functions to use in evaluation to return true/false whether character is a operand or operator.
+function isOperand(char) {
+    return char >= '0' && char <= '9';
+}
+
+function isOperator(char) {
+    return operatorPrecedence.hasOwnProperty(char);
+}
+
 // Handle the equals button
 function handleEquals() {
-    // First, change the global variable equationComplete to 1 so we can clear the screen when a new number is pressed next.
+    // First, change the global variable equationComplete to 1 so we can clear the screen when a new number is pressed.
     equationComplete = 1;
     let problemElement = document.getElementById("screen");
     let problemString = problemElement.value;
-
-    /*
-    Proof of concept using eval(), however not good for production. Will write code to break down the string from the screen and evaluate the equation.
     
-    let solution = eval(problemString);
-    let screen = document.getElementById("screen");
-    screen.value = solution;
-    */
-
-    /*
-    Below is the code to evaluate the equation. All button values for operands and operators have a space added by design to make it easier to split.
-    */
+     //All button values for operands and operators have a space added by design to make it easier to split. That's a bit of a cheat on my part to make this easier so I don't have to think about building numbers/decimal points.
+    
     let problemArray = problemString.split(" ");
-    console.log(problemArray);
+    //console.log(problemArray);
     let outputQueue = new Array();
     let operatorStack = new Array();
+    
+    // Create post-fix notation
+    for (let i = 0; i < problemArray.length; i++) {
+        if (!isNaN(problemArray[i])) {
+            outputQueue.push(problemArray[i]);
+        } else if (problemArray[i] == '+' || problemArray[i] == '-' || problemArray[i] == '*' || problemArray[i] == '/') {
+            
+            var currentPrecedence = operatorPrecedence[problemArray[i]];
+            // Calculate previous precedence and run a while loop to test if the new operator has a higher precedence or not and push to outputQueue if needed.
 
+            while (operatorStack.length > 0) {
+                var topOperator = operatorStack.at(-1);
+                var previousPrecedence = operatorPrecedence[topOperator];
+
+                if (previousPrecedence >= currentPrecedence) {
+                    outputQueue.push(operatorStack.pop());
+                } else {
+                    break;
+                }
+            }
+            operatorStack.push(problemArray[i]);   
+        } else {
+            console.log('Error detected.');
+            screen.value('Error');
+        }        
+    }
+
+    // Move remaining operators from operatorStack to the outputQueue
+    while (operatorStack.length > 0) {
+        outputQueue.push(operatorStack.pop());
+    }
+
+    console.log(outputQueue);
+    console.log(operatorStack);
 }
