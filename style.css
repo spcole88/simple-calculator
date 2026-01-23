@@ -6,6 +6,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-image: url("desktop-background.png");
+    background-size: fill;
 }
 
 .calculator-container {
@@ -18,6 +20,7 @@ body {
 .calculator {
     border-radius: 10px;
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.2);
+    background-color: white;
 }
 
 .calculator--screen {
