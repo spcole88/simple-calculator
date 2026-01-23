@@ -58,17 +58,8 @@ function isOperator(char) {
     return operatorPrecedence.hasOwnProperty(char);
 }
 
-// Handle the equals button
-function handleEquals() {
-    // First, change the global variable equationComplete to 1 so we can clear the screen when a new number is pressed.
-    equationComplete = 1;
-    let problemElement = document.getElementById("screen");
-    let problemString = problemElement.value;
-    
-     //All button values for operands and operators have a space added by design to make it easier to split. That's a bit of a cheat on my part to make this easier so I don't have to think about building numbers/decimal points.
-    
-    let problemArray = problemString.split(" ");
-    //console.log(problemArray);
+function toPostfix(problemArray) {
+    // This function will return an array.
     let outputQueue = new Array();
     let operatorStack = new Array();
     
@@ -93,8 +84,9 @@ function handleEquals() {
             }
             operatorStack.push(problemArray[i]);   
         } else {
-            console.log('Error detected.');
-            screen.value('Error');
+            //console.log('Error detected.');
+            //screen.value('Error');
+            throw new Error('There has been an error converting to postfix notation. It probably encountered a character that was not supposed to be there.');
         }        
     }
 
@@ -103,6 +95,80 @@ function handleEquals() {
         outputQueue.push(operatorStack.pop());
     }
 
-    console.log(outputQueue);
-    console.log(operatorStack);
+    //console.log(outputQueue);
+    //console.log(operatorStack);
+    return outputQueue;
+}
+
+function runCalculation(operator, operandA, operandB) {
+    switch (operator) {
+        case '+':
+            return operandA + operandB;
+        
+        case '-':
+            return operandA - operandB;
+
+        case '*':
+            return operandA * operandB;
+
+        case '/':
+            if (operandB === 0) {
+                throw new Error('Division by 0 not possible.');
+            }
+            return operandA / operandB;
+
+        default:
+            // This part should never run as there shouldn't be any operators that are not recognised.
+            throw new Error('Unknown operator encountered: ${operator}');
+    }
+}
+
+function calculateEquation(postfixEquation) {
+    const calcStack = [];
+
+    for (const token of postfixEquation) {
+        // Push numbers straight onto the calcStack if it's a number
+        if (!isNaN(parseFloat(token))) {
+            calcStack.push(parseFloat(token));
+        } else if (isOperator(token)) {
+            if (calcStack.length < 2) {
+                throw new Error("The postfix equation does not look right, there are not enough operands.");
+            }
+
+            const operandB = calcStack.pop();
+            const operandA = calcStack.pop();
+
+            const result = runCalculation(token, operandA, operandB);
+            calcStack.push(result);
+        }
+    }
+
+    return calcStack;
+}
+
+// Handle the equals button
+function handleEquals() {
+    // First, change the global variable equationComplete to 1 so we can clear the screen when a new number is pressed.
+    equationComplete = 1;
+    let problemElement = document.getElementById("screen");
+    let problemString = problemElement.value;
+    
+     //All button values for operands and operators have a space added by design to make it easier to split. That's a bit of a cheat on my part to make this easier so I don't have to think about building numbers/decimal points.
+    
+    try {
+        let problemArray = problemString.split(" ");
+        //console.log(problemArray);
+
+        // Convert to postfix notation
+        let postfixEquation = toPostfix(problemArray);
+
+        // Next it's time to evaluate the equation that's now in postfix by looping through
+        let finalResult = calculateEquation(postfixEquation);
+
+        // Put the final result on the screen.
+        screen.value = finalResult;
+    } catch (error) {
+        console.log(error.message);
+    }
+    
 }
