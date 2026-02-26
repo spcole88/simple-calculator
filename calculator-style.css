@@ -1,3 +1,6 @@
+/*
+* Commented out this styling for when I add the calculator to my WordPress site.
+*
 body {
     width: 100%;
     height: 100%;
@@ -8,7 +11,7 @@ body {
     align-items: center;
     background-image: url("desktop-background.png");
     background-size: fill;
-}
+}*/
 
 .calculator-container {
     box-sizing: border-box;
